@@ -27,10 +27,10 @@ const joinData = () => {
 		for (let j = 0; j < indoorData.length; j++) {
 			if (Math.abs(new Date(kmaWeatherData[i][5]).getTime() - new Date(indoorData[j][8]).getTime()) < 600000) {
 				joinedData.push({
-					indoor_temperature: indoorData[j][5],
-					indoor_humidity: indoorData[j][6],
-					outdoor_temperature: kmaWeatherData[i][3],
-					outdoor_humidity: kmaWeatherData[i][4],
+					indoor_temperature: parseInt(indoorData[j][5]),
+					indoor_humidity: parseInt(indoorData[j][6]),
+					outdoor_temperature: parseInt(parseFloat(kmaWeatherData[i][3])),
+					outdoor_humidity: parseInt(parseFloat(kmaWeatherData[i][4])),
 					timestamp: new Date(kmaWeatherData[i][5]),
 				});
 			}
@@ -42,17 +42,16 @@ const joinData = () => {
 console.log(joinData());
 
 async function main() {
-	await prisma.data.deleteMany();
 	const data = await prisma.environment.createMany({
-		data: getCsvData('data'),
+		data: joinData(),
 		skipDuplicates: true,
 	});
 }
 
-// main()
-// 	.catch((e) => {
-// 		console.error(e.message);
-// 	})
-// 	.finally(async () => {
-// 		await prisma.$disconnect();
-// 	});
+main()
+	.catch((e) => {
+		console.error(e.message);
+	})
+	.finally(async () => {
+		await prisma.$disconnect();
+	});
