@@ -1,0 +1,126 @@
+<head>
+	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+	<script type="importmap">
+    {
+      "imports": {
+        "@material/web/": "https://esm.run/@material/web/"
+      }
+    }
+  </script>
+	<script type="module">
+		import '@material/web/all.js';
+		import { styles as typescaleStyles } from '@material/web/typography/md-typescale-styles.js';
+
+		document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+	</script>
+</head>
+
+<body>
+	<div class="container">
+		<h1 class="md-typescale-display-medium">Hello Material!</h1>
+		<div class="column" role="group" aria-label="Settings">
+			<label>Temperature<md-switch icons show-only-selected-icon selected></md-switch></label>
+			<label>Humiduty<md-switch icons show-only-selected-icon></md-switch></label>
+			<input type="date" id="from" name="from" value="2024-01-01">
+			<input type="date" id="to" name="to" value="2024-01-31">
+		</div>
+		<div id="chart"></div>
+	</div>
+	<style>
+		form {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 16px;
+		}
+
+		.container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			height: 100vh;
+			font-family: 'Roboto', sans-serif;
+		}
+
+		#chart {
+			margin-top: 20px;
+			width: 80%;
+		}
+	</style>
+	<script>
+		const from = document.getElementById('from');
+		const to = document.getElementById('to');
+		from.addEventListener('change', () => {
+			document.getElementById('chart').innerHTML = '';
+			createChart(from.value, to.value);
+		});
+
+		to.addEventListener('change', () => {
+			document.getElementById('chart').innerHTML = '';
+			createChart(from.value, to.value);
+		});
+
+		const createChart = async (from, to) => {
+			const response = await fetch(`/data?from=${from}&to=${to}`);
+			const data = await response.json();
+
+			const timestamp = data.map(d => d.timestamp);
+			const temperature = data.map(d => d.temperature);
+			const humidity = data.map(d => d.humidity);
+
+			var options = {
+				series: [{
+					name: 'temperature',
+					data: temperature
+				}, {
+					name: 'humidity',
+					data: humidity
+				}],
+				chart: {
+					height: 400,
+					type: 'line',
+				},
+				stroke: {
+					width: 5,
+					curve: 'smooth'
+				},
+				xaxis: {
+					type: 'datetime',
+					categories: timestamp,
+					tickAmount: 10,
+					labels: {
+						formatter: function (value, timestamp, opts) {
+							return opts.dateFormatter(new Date(timestamp), 'dd MMM')
+						}
+					}
+				},
+				title: {
+					text: 'Classroom Environment',
+					align: 'left',
+					style: {
+						fontSize: "16px",
+						color: '#666'
+					}
+				},
+				fill: {
+					type: 'gradient',
+					gradient: {
+						shade: 'dark',
+						gradientToColors: ['#FDD835'],
+						shadeIntensity: 1,
+						type: 'horizontal',
+						opacityFrom: 1,
+						opacityTo: 1,
+						stops: [0, 100, 100, 100]
+					},
+				}
+			};
+			var chart = new ApexCharts(document.querySelector("#chart"), options);
+			chart.render();
+		}
+
+		createChart('2024-01-01', '2024-01-31');
+	</script>
+</body>
