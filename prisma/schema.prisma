@@ -14,8 +14,10 @@ datasource db {
 }
 
 model environment {
-  id          Int      @id @default(autoincrement())
-  temperature Int
-  humidity    Int
-  timestamp   DateTime
+  id                  Int      @id @default(autoincrement())
+  indoor_temperature  Int
+  indoor_humidity     Int
+  outdoor_temperature Int
+  outdoor_humidity    Int
+  timestamp           DateTime
 }
