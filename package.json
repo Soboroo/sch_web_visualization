@@ -10,7 +10,7 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^5.14.0",
-    "csv": "^6.3.9",
+    "apexcharts": "^3.49.1",
     "express": "^4.19.2",
     "prisma": "^5.14.0"
   }

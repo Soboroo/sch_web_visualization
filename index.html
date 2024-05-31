@@ -18,35 +18,50 @@
 
 <body>
 	<div class="container">
-		<h1 class="md-typescale-display-medium">Hello Material!</h1>
+		<h1 class="md-typescale-display-medium">Environmental Data Visualization</h1>
 		<div class="column" role="group" aria-label="Settings">
+			<label for="normalize">Normalize</label>
+			<md-switch id="normalize"></md-switch>
 			<input type="date" id="from" name="from" value="2024-01-01">
 			<input type="date" id="to" name="to" value="2024-01-31">
 		</div>
 		<div id="chart"></div>
-		<div id="heatmap"></div>
+		<div style="display: flex; margin: 16px;">
+			<div id="coefficientHeatmap"></div>
+			<div id="dtwHeatmap"></div>
+		</div>
 	</div>
+	<footer>
+		<md-tabs id="tab_selector">
+			<md-primary-tab selected>Home</md-primary-tab>
+			<md-primary-tab>Correlation Graph</md-primary-tab>
+		</md-tabs>
+	</footer>
 	<style>
-		form {
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 16px;
-		}
-
 		.container {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			justify-content: center;
-			height: 100vh;
 			font-family: 'Roboto', sans-serif;
+			flex-wrap: wrap;
 		}
 
 		#chart {
 			margin-top: 20px;
 			width: 80%;
 		}
+
+		#chart2 {
+			margin-top: 20px;
+			width: 80%;
+		}
+
+		footer {
+			position: fixed;
+			bottom: 0;
+			width: 100%;
+		}
 	</style>
-	<script src="/chartGenerate.js"></script>
+	<script src="/index.js"></script>
 </body>

@@ -9,9 +9,13 @@ app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/index.html');
 });
 
+app.get('/correlations', async (req, res) => {
+	res.sendFile(__dirname + '/correlations.html');
+});
+
 app.get('/coefficients', async (req, res) => {
 	const data = await queryBetweenDate(req.query.from, req.query.to);
-	const serise = [
+	const series = [
 		data.map((d) => d.indoor_temperature),
 		data.map((d) => d.indoor_humidity),
 		data.map((d) => d.outdoor_temperature),
@@ -20,8 +24,8 @@ app.get('/coefficients', async (req, res) => {
 
 	const coefficientData = {
 		labels: ['indoor_temperature', 'indoor_humidity', 'outdoor_temperature', 'outdoor_humidity'],
-		coefficients: serise.map((s) => {
-			return serise.map((ss) => {
+		coefficients: series.map((s) => {
+			return series.map((ss) => {
 				return coefficient(s, ss);
 			});
 		})
@@ -32,7 +36,7 @@ app.get('/coefficients', async (req, res) => {
 
 app.get('/dtw', async (req, res) => {
 	const data = await queryBetweenDate(req.query.from, req.query.to);
-	const serise = [
+	const series = [
 		data.map((d) => d.indoor_temperature),
 		data.map((d) => d.indoor_humidity),
 		data.map((d) => d.outdoor_temperature),
@@ -41,9 +45,9 @@ app.get('/dtw', async (req, res) => {
 
 	const dtwData = {
 		labels: ['indoor_temperature', 'indoor_humidity', 'outdoor_temperature', 'outdoor_humidity'],
-		dtw: serise.map((s) => {
-			return serise.map((ss) => {
-				return dwt(normalize(s), normalize(ss));
+		dtw: series.map((s) => {
+			return series.map((ss) => {
+				return dtw(normalize(s), normalize(ss));
 			});
 		})
 	}
@@ -93,16 +97,16 @@ const coefficient = (x, y) => {
 }
 
 // Dynamic Time Warping
-const dwt = (x, y) => {
+const dtw = (x, y) => {
 	const n = x.length;
 	const m = y.length;
-	const dtw = Array.from({ length: n + 1 }, () => Array.from({ length: m + 1 }, () => Infinity));
-	dtw[0][0] = 0;
+	const dist = Array.from({ length: n + 1 }, () => Array.from({ length: m + 1 }, () => Infinity));
+	dist[0][0] = 0;
 	for (let i = 1; i <= n; i++) {
 		for (let j = 1; j <= m; j++) {
 			const cost = Math.abs(x[i - 1] - y[j - 1]);
-			dtw[i][j] = cost + Math.min(dtw[i - 1][j], dtw[i][j - 1], dtw[i - 1][j - 1]);
+			dist[i][j] = cost + Math.min(dist[i - 1][j], dist[i][j - 1], dist[i - 1][j - 1]);
 		}
 	}
-	return dtw[n][m];
+	return dist[n][m];
 }

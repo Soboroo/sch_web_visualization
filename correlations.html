@@ -1,0 +1,87 @@
+<head>
+	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+	<script type="importmap">
+    {
+      "imports": {
+        "@material/web/": "https://esm.run/@material/web/"
+      }
+    }
+  </script>
+	<script type="module">
+		import '@material/web/all.js';
+		import { styles as typescaleStyles } from '@material/web/typography/md-typescale-styles.js';
+
+		document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+	</script>
+</head>
+
+<body>
+	<div class="container">
+		<h1 class="md-typescale-display-medium">Pearson Correlation Coefficient</h1>
+		<div class="column" role="group" aria-label="Settings">
+			<label for="normalize">Normalize</label>
+			<md-switch id="normalize"></md-switch>
+			<input type="date" id="from" name="from" value="2024-01-01">
+			<input type="date" id="to" name="to" value="2024-01-31">
+			<md-outlined-select id="x_axis_selector">
+				<md-select-option selected value="indoor_temperature">
+					<div slot="headline">Indoor Temperature</div>
+				</md-select-option>
+				<md-select-option value="indoor_humidity">
+					<div slot="headline">Indoor Humidity</div>
+				</md-select-option>
+				<md-select-option value="outdoor_temperature">
+					<div slot="headline">Outdoor Temperature</div>
+				</md-select-option>
+				<md-select-option value="outdoor_humidity">
+					<div slot="headline">Outdoor Humidity</div>
+				</md-select-option>
+			</md-outlined-select>
+			<md-outlined-select id="y_axis_selector">
+				<md-select-option selected value="indoor_temperature">
+					<div slot="headline">Indoor Temperature</div>
+				</md-select-option>
+				<md-select-option value="indoor_humidity">
+					<div slot="headline">Indoor Humidity</div>
+				</md-select-option>
+				<md-select-option value="outdoor_temperature">
+					<div slot="headline">Outdoor Temperature</div>
+				</md-select-option>
+				<md-select-option value="outdoor_humidity">
+					<div slot="headline">Outdoor Humidity</div>
+				</md-select-option>
+			</md-outlined-select>
+		</div>
+		<div id="chart"></div>
+		<p id="correlation" class="md-typescale-body-medium"></p>
+	</div>
+	<footer>
+		<md-tabs id="tab_selector">
+			<md-primary-tab>Home</md-primary-tab>
+			<md-primary-tab selected>Correlation Graph</md-primary-tab>
+		</md-tabs>
+	</footer>
+	<style>
+		.container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			font-family: 'Roboto', sans-serif;
+			flex-wrap: wrap;
+		}
+
+		#chart {
+			margin-top: 20px;
+			width: 80%;
+		}
+
+		footer {
+			position: fixed;
+			bottom: 0;
+			width: 100%;
+		}
+	</style>
+	<script src="/correlations.js"></script>
+</body>

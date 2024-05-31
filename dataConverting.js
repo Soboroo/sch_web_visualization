@@ -39,8 +39,6 @@ const joinData = () => {
 	return joinedData;
 }
 
-console.log(joinData());
-
 async function main() {
 	const data = await prisma.environment.createMany({
 		data: joinData(),

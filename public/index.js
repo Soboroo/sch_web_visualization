@@ -1,30 +1,58 @@
 const from = document.getElementById('from');
 const to = document.getElementById('to');
+const tab_selector = document.getElementById('tab_selector');
 from.addEventListener('change', () => {
 	document.getElementById('chart').innerHTML = '';
-	createChart(from.value, to.value);
+	createChart(from.value, to.value, normalize_button.selected);
 
-	document.getElementById('heatmap').innerHTML = '';
-	createHeatmap(from.value, to.value);
+	document.getElementById('coefficientHeatmap').innerHTML = '';
+	createCoefficientHeatmap(from.value, to.value);
+
+	document.getElementById('dtwHeatmap').innerHTML = '';
+	createDTWHeatmap(from.value, to.value);
 });
 
 to.addEventListener('change', () => {
 	document.getElementById('chart').innerHTML = '';
-	createChart(from.value, to.value);
+	createChart(from.value, to.value, normalize_button.selected);
 
 	document.getElementById('heatmap').innerHTML = '';
-	createHeatmap(from.value, to.value);
+	createCoefficientHeatmap(from.value, to.value);
+
+	document.getElementById('dtwHeatmap').innerHTML = '';
+	createDTWHeatmap(from.value, to.value);
 });
 
-const createChart = async (from, to) => {
+tab_selector.addEventListener('change', (event) => {
+	if (event.target.activeTabIndex === 0) {
+		location.href = '/';
+	} else if (event.target.activeTabIndex === 1) {
+		location.href = '/correlations';
+	}
+});
+
+const normalize_button = document.getElementById('normalize');
+normalize_button.addEventListener('change', () => {
+	document.getElementById('chart').innerHTML = '';
+	createChart(from.value, to.value, normalize_button.selected);
+});
+
+const createChart = async (from, to, normalizeOption = false) => {
 	const response = await fetch(`/data?from=${from}&to=${to}`);
 	const data = await response.json();
 
-	const indoor_temperature = data.map(d => d.indoor_temperature);
-	const indoor_humidity = data.map(d => d.indoor_humidity);
-	const outdoor_temperature = data.map(d => d.outdoor_temperature);
-	const outdoor_humidity = data.map(d => d.outdoor_humidity);
+	let indoor_temperature = data.map(d => d.indoor_temperature);
+	let indoor_humidity = data.map(d => d.indoor_humidity);
+	let outdoor_temperature = data.map(d => d.outdoor_temperature);
+	let outdoor_humidity = data.map(d => d.outdoor_humidity);
 	const timestamp = data.map(d => d.timestamp);
+
+	if (normalizeOption) {
+		indoor_temperature = normalize(indoor_temperature);
+		indoor_humidity = normalize(indoor_humidity);
+		outdoor_temperature = normalize(outdoor_temperature);
+		outdoor_humidity = normalize(outdoor_humidity);
+	}
 
 	var options = {
 		series: [
@@ -89,7 +117,7 @@ const createChart = async (from, to) => {
 }
 createChart(from.value, to.value);
 
-const createHeatmap = async (from, to) => {
+const createCoefficientHeatmap = async (from, to) => {
 	const response = await fetch(`/coefficients?from=${from}&to=${to}`);
 	const data = await response.json();
 
@@ -172,7 +200,54 @@ const createHeatmap = async (from, to) => {
 		}
 	};
 
-	var heatmap = new ApexCharts(document.querySelector("#heatmap"), options);
+	var heatmap = new ApexCharts(document.querySelector("#coefficientHeatmap"), options);
 	heatmap.render();
 }
-createHeatmap(from.value, to.value);
+createCoefficientHeatmap(from.value, to.value);
+
+const createDTWHeatmap = async (from, to) => {
+	const response = await fetch(`/dtw?from=${from}&to=${to}`);
+	const data = await response.json();
+
+	const series = [];
+	for (let i = 0; i < data.labels.length; i++) {
+		series.push({
+			name: data.labels[i],
+			data: data.dtw[i]
+		});
+	}
+
+	const options = {
+		series: series,
+		chart: {
+			height: 400,
+			type: 'heatmap',
+		},
+		colors: ['#008FFB'],
+		xaxis: {
+			categories: data.labels
+		},
+		dataLabels: {
+			enabled: false
+		},
+		title: {
+			text: 'Dynamic Time Warping',
+			align: 'left',
+			style: {
+				fontSize: "16px",
+				color: '#666'
+			}
+		}
+	};
+
+	var heatmap = new ApexCharts(document.querySelector("#dtwHeatmap"), options);
+	heatmap.render();
+}
+
+createDTWHeatmap(from.value, to.value);
+
+const normalize = (data) => {
+	const min = Math.min(...data);
+	const max = Math.max(...data);
+	return data.map((d) => (d - min) / (max - min));
+}
